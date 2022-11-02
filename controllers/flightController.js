@@ -38,8 +38,14 @@ exports.getFlight = (req, res) => {
 // Public
 exports.addFlight = async (req, res) => {
     try {
-        const flight = { ...req.body, id: Date.now() }
+        const { title, time, price, date } = req.body
 
+        // validation of flight details
+        if (!title || !time || !price || !date) {
+            return res.status(400).json({ message: "Invalid Flight details" })
+        }
+
+        const flight = { id: Date.now(), ...req.body }
         Flight.push(flight)
 
         res.status(201).json({
@@ -54,13 +60,15 @@ exports.addFlight = async (req, res) => {
 
 // @desc Delete  flight
 // Public
-exports.deleteFlight = (req, res) => {
+exports.deleteFlight = async (req, res) => {
     try {
         const id = req.params.id
-        const flights = Flight.filter(i => i.id !== id)
+        const flight = Flight.find(i => i.id === id)
+        Flight.splice(Flight.indexOf(flight), 1)
 
         res.status(200).json({
-            message: "Flight Deleted"
+            message: "Flight Deleted",
+            flight: flight
         })
 
     } catch (err) {
@@ -70,20 +78,33 @@ exports.deleteFlight = (req, res) => {
 
 // @desc Update flight
 // Public
-exports.updateFlight = (req, res) => {
+exports.updateFlight = async (req, res) => {
     try {
         const id = req.params.id;
-        const flight = Flight.find(i => i.id === id)
+        const { title, time, price, date } = req.body
 
-        flight = req.body
+        const flight = await Flight.find(i => i.id === id)
+
+        flight.title = title
+        flight.time = time
+        flight.price = price
+        flight.date = date
 
         res.status(200).json({
             message: "Flight Updated",
             flight: flight
         })
+
     } catch (err) {
         res.status(500).json({
             message: err
         })
     }
 }
+
+// {
+//     "title": "flight to canada",
+//     "time": "1pm",
+//     "price": 26000,
+//     "date": "26-06-2022"
+// }
