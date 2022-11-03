@@ -16,28 +16,6 @@ exports.getFlights = (req, res) => {
     }
 }
 
-// @desc GET single flight
-// Public
-exports.getFlight = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const singleFlight = await Flight.find((flight) => flight.id == id)
-
-        if (!singleFlight) {
-            return res.status(400).json({ message: "No flight" })
-        }
-
-        res.status(200).json({
-            message: "One Flight",
-            flight: singleFlight
-        })
-    } catch (err) {
-        res.status(400).json({
-            message: err
-        })
-    }
-}
-
 // @desc POST Book/add flight
 // Public
 exports.addFlight = async (req, res) => {
@@ -62,33 +40,44 @@ exports.addFlight = async (req, res) => {
     }
 }
 
-// @desc DELETE Delete flight
+// @desc GET single flight
 // Public
-exports.deleteFlight = async (req, res) => {
+exports.getFlight = async (req, res) => {
     try {
-        const id = req.params.id;
-        const flight = await Flight.find(i => i.id == id)
-        Flight.splice(Flight.indexOf(flight), 1)
+        const id = Number(req.params.id);
+        const singleFlight = await Flight.find((flight) => flight.id === id)
+
+        if (!singleFlight) {
+            return res.status(400).json({ message: "Incorrect Flight id" })
+        }
 
         res.status(200).json({
-            message: "Flight Deleted",
-            flight: flight
+            message: "One Flight",
+            flight: singleFlight
         })
-
     } catch (err) {
-        res.status(500).json({
+        res.status(400).json({
             message: err
         })
     }
 }
 
-// @desc PATCH Update flight
+// @desc PUT Update flight
 // Public
 exports.updateFlight = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = Number(req.params.id);
         const { title, time, price, date } = req.body
-        const flight = await Flight.find(i => i.id == id)
+        const flight = await Flight.find(i => i.id === id)
+
+        // cant find flight with the id
+        if (!flight) {
+            return res.status(400).json({ message: "Incorrect Flight id" })
+        }
+        // validation of flight details
+        if (!title || !time || !price || !date) {
+            return res.status(400).json({ message: "Incomplete Flight details" })
+        }
 
         flight.title = title
         flight.time = time
@@ -101,7 +90,31 @@ exports.updateFlight = async (req, res) => {
         })
 
     } catch (err) {
-        res.status(501).json({
+        res.status(500).json({
+            message: err
+        })
+    }
+}
+
+// @desc DELETE Delete flight
+// Public
+exports.deleteFlight = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const flight = await Flight.find(i => i.id === id)
+        // cant find flight with the id
+        if (!flight) {
+            return res.status(400).json({ message: "Incorrect Flight id" })
+        }
+        Flight.splice(Flight.indexOf(flight), 1)
+
+        res.status(200).json({
+            message: "Flight Deleted",
+            flight: flight
+        })
+
+    } catch (err) {
+        res.status(500).json({
             message: err
         })
     }
