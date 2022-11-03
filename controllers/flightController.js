@@ -1,6 +1,6 @@
 const Flight = require('../models/Flight')
 
-// @desc Get all flights
+// @desc GET all flights
 // Public
 exports.getFlights = (req, res) => {
 
@@ -16,16 +16,20 @@ exports.getFlights = (req, res) => {
     }
 }
 
-// @desc Get single flight
+// @desc GET single flight
 // Public
-exports.getFlight = (req, res) => {
+exports.getFlight = async (req, res) => {
     try {
         const id = req.params.id;
-        const flight = Flight.find(i => i.id === id)
+        const singleFlight = await Flight.find((flight) => flight.id == id)
+
+        if (!singleFlight) {
+            return res.status(400).json({ message: "No flight" })
+        }
 
         res.status(200).json({
             message: "One Flight",
-            flight: flight
+            flight: singleFlight
         })
     } catch (err) {
         res.status(400).json({
@@ -34,7 +38,7 @@ exports.getFlight = (req, res) => {
     }
 }
 
-// @desc Book/add flight
+// @desc POST Book/add flight
 // Public
 exports.addFlight = async (req, res) => {
     try {
@@ -50,7 +54,7 @@ exports.addFlight = async (req, res) => {
 
         res.status(201).json({
             message: "Flight Created",
-            flight
+            flight: flight
         })
 
     } catch (err) {
@@ -58,12 +62,12 @@ exports.addFlight = async (req, res) => {
     }
 }
 
-// @desc Delete  flight
+// @desc DELETE Delete flight
 // Public
 exports.deleteFlight = async (req, res) => {
     try {
-        const id = req.params.id
-        const flight = Flight.find(i => i.id === id)
+        const id = req.params.id;
+        const flight = await Flight.find(i => i.id == id)
         Flight.splice(Flight.indexOf(flight), 1)
 
         res.status(200).json({
@@ -72,18 +76,19 @@ exports.deleteFlight = async (req, res) => {
         })
 
     } catch (err) {
-
+        res.status(500).json({
+            message: err
+        })
     }
 }
 
-// @desc Update flight
+// @desc PATCH Update flight
 // Public
 exports.updateFlight = async (req, res) => {
     try {
         const id = req.params.id;
         const { title, time, price, date } = req.body
-
-        const flight = await Flight.find(i => i.id === id)
+        const flight = await Flight.find(i => i.id == id)
 
         flight.title = title
         flight.time = time
@@ -96,7 +101,7 @@ exports.updateFlight = async (req, res) => {
         })
 
     } catch (err) {
-        res.status(500).json({
+        res.status(501).json({
             message: err
         })
     }

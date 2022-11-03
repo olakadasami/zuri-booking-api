@@ -5,10 +5,16 @@ const models = require("./models/Flight");
 const routes = require("./routes/flightRoute");
 
 const app = express();
+// middleware
+app.use((req, res, next) => {
+  console.log(req.method, 'request made')
+  console.log(req.path)
+  next();
+})
 
 app.use(json());
 
-app.use("/", routes);
+app.use("/flights", routes);
 
 const port = process.env.PORT || 3000;
 
