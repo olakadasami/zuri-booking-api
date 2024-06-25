@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 app.use(json());
 
 app.get("/", (req, res) => {
-  res.send("Hello from App Engine!");
+  res.json("Hello from App Engine!");
 });
 app.use("/flights", routes);
 
