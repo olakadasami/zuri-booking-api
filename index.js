@@ -6,14 +6,17 @@ const routes = require("./routes/flightRoute");
 
 const app = express();
 // middleware
+app.set("trust proxy", true);
 app.use((req, res, next) => {
-  console.log(req.method, 'request made')
-  console.log(req.path)
+  console.log(req.method, "request made");
+  console.log(req.path);
   next();
-})
-
+});
 app.use(json());
 
+app.get("/", (req, res) => {
+  res.send("Hello from App Engine!");
+});
 app.use("/flights", routes);
 
 const port = process.env.PORT || 3000;
